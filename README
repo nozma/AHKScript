@@ -1,0 +1,4 @@
+AutoHotkey[http://www.autohotkey.com/]のスクリプトです．
+- SendVimtoR.ahk
+-- VimからRを便利に使うためのいくつかのショートカット
+-- 選択範囲の送信だけなら任意のアプリケーションから実行できる
