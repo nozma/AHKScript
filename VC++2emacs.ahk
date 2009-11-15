@@ -2,4 +2,5 @@
 #IfWinActive, ahk_class wndclass_desked_gsk
 {
     ^h::BS
+    `;::Send,`;{Tab}    ;; Auto tab when pressed ";"
 }
