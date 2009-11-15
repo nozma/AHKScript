@@ -1,4 +1,8 @@
 AutoHotkey[http://www.autohotkey.com/]のスクリプトです．
+- all.ahk
+-- このディレクトリの.ahkファイルを全部読み込む
 - SendVimtoR.ahk
 -- VimからRを便利に使うためのいくつかのショートカット
 -- 選択範囲の送信だけなら任意のアプリケーションから実行できる
+- VC++2emacs.ahk
+-- VC++2008の操作をよりemacsっぽくするためのキーマッピングなど
