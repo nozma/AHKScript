@@ -10,6 +10,7 @@
 
 ;; ホットキーリスト
 ; F3:    選択範囲をR Consoleに送って実行．選択がない場合はクリップボード内を送る．
+;        キーを離すまでウィンドウのフォーカスはRのまま．
 ; F4:    現在の行をR Consoleに送って実行し，次の行に進む(gvimのみ)．
 ; C-c v: カーソル下のオブジェクト名でヘルプを引く(gvimのみ)．
 ; C-M-q: R Consoleの終了
@@ -31,7 +32,7 @@
         WinActivate, R Console
         sendinput, {Raw}%clipboard%
         sendinput, {enter}
-        ;Sleep 1000
+        KeyWait, F3
         WinActivate, ahk_id %active_id%
     }
     return
