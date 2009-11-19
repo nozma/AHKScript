@@ -34,10 +34,11 @@
         ;Sleep 1000
         WinActivate, ahk_id %active_id%
     }
-return
+    return
 
+;; For vim
+#IfWinActive, ahk_class Vim
 ; F4 Send the current line in the gvim, and moves to the next line. (for gvim)
-    #IfWinActive, ahk_class Vim
     F4::
     {
         WinGet, active_id, ID, A
@@ -52,10 +53,9 @@ return
         sendinput, {enter}
         WinActivate, ahk_id %active_id%
     }
-return 
+    return 
 
 ; C-c v Get help. (for gvim)
-    #IfWinActive, ahk_class Vim
     ^c::
     Input, OutputVar, C I M T1, {Esc},v
     if ErrorLevel = Match 
@@ -73,19 +73,21 @@ return
         IfWinNotExist, R help on
             WinActivate, ahk_id %active_id%
     }
-return
+    return
+#IfWinActive
 
 ; C-M-q(Ctrl+Alt+q) Quit R Console.
-    #IfWinExist, R Console
+#IfWinExist, R Console
     !^q::
     {
         WinActivate, R Console
         sendinput, quit(save="no"){enter}
     }
 return
+#IfWinExist
 
 ; q Quit R Help and return to gvim.
-    #IfWinActive, R Help on
+#IfWinActive, R Help on
     q::
     IfWinExist, ahk_class Vim
     {
@@ -94,5 +96,5 @@ return
     }
     else Send, q
 return
-
+#IfWinActive
 
