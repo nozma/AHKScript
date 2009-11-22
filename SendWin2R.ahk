@@ -16,6 +16,26 @@
 ; C-M-q: R Consoleの終了
 ; q:     R Helpを閉じる．その際gvimが立ち上がっていればgvimをアクティブにする．
 
+; C-M-r Run R, and return focus.
+!^r::
+{
+    WinGet, active_id, ID, A
+        Run, rgui --sdi
+        WinWait, R Console
+        WinActivate, ahk_id %active_id%
+}
+return
+
+; C-M-Shift-r Run R.
++!^r::
+{
+    Run, rgui --sdi
+        WinWait, R Console
+}
+return
+
+; Activate hotkeys while exists R Console.
+#IfWinExist R Console
 ; F3 Send selected region to R. #WinActivateForce
 F3::
 {
@@ -23,11 +43,6 @@ F3::
         IfWinActive, ahk_class Vim
         Send y
         else Send ^c
-            IfWinNotExist, R Console
-            {
-                Run, rgui --sdi
-                    WinWait, R Console
-            }
         WinActivate, R Console
             sendinput, {Raw}%clipboard%
             sendinput, {enter}
@@ -36,18 +51,13 @@ F3::
 }
 return
 
-; F4 Send the current line in the gvim, and moves to the next line. (for gvim)
+; F4 Send the current line, and moves to the next line.
 F4::
 {
     WinGet, active_id, ID, A
     IfWinActive, ahk_class Vim
     Send 0y$j ; for gvim
     else Send {home}{shiftdown}{end}{left}{shiftup}^c{down}{home} ; for other windows application
-        IfWinNotExist, R Console
-        {
-            Run, rgui  --sdi
-                WinWait, R Console
-        }
     WinActivate, R Console
         sendinput, {Raw}%clipboard%
         sendinput, {enter}
@@ -63,11 +73,6 @@ if ErrorLevel = Match
 {
     WinGet, active_id, ID, A
     Send {ctrldown}{left}{shiftdown}{right}{ctrlup}{shiftup}^c{left}
-    IfWinNotExist, R Console
-    {
-        Run, rgui --sdi
-            WinWait, R Console
-    }
     WinActivate, R Console
         sendinput, {Raw}help(%clipboard%)
         sendinput, {enter}
@@ -84,11 +89,6 @@ if ErrorLevel = Match
 {
     WinGet, active_id, ID, A
     Send yiw ; yank word
-    IfWinNotExist, R Console
-    {
-        Run, rgui --sdi
-            WinWait, R Console
-    }
     WinActivate, R Console
         sendinput, {Raw}help(%clipboard%)
         sendinput, {enter}
@@ -99,14 +99,12 @@ return
 #IfWinActive
 
 ; C-M-q(Ctrl+Alt+q) Quit R Console.
-#IfWinExist, R Console
 !^q::
 {
     WinActivate, R Console
         sendinput, quit(save="no"){enter}
 }
 return
-#IfWinExist
 
 ; q Quit R Help and return to window.
 #IfWinActive, R Help on
@@ -117,3 +115,5 @@ q::
 }
 return
 #IfWinActive
+
+#IfWinExist
