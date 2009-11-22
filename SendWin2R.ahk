@@ -62,7 +62,7 @@ return
 ; C-c v Get help. 
 #IfWinNotActive, ahk_class Vim
 ~^c::
-Input, OutputVar, C I M T1, {Esc},v
+Input, OutputVar, C I M T1 V, {Esc},v
 if ErrorLevel = Match 
 {
     WinGet, active_id, ID, A
