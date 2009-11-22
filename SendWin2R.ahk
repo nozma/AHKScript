@@ -1,11 +1,113 @@
-;; æ¦‚è¦
-; Windowsã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³(e.g. ãƒ¡ãƒ¢å¸³)ã‹ã‚‰ä¾¿åˆ©ã«Rã‚’ä½¿ã†ãŸã‚ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆ
-; SendVimtoR.ahkã‚’gvimä»¥å¤–ã®ã‚¢ãƒ—ãƒªã«æ‹¡å¼µã—ãŸã‚‚ã®
+;; ŠT—v
+; Windows‚Ìgvimã‚ÅR‚ªg‚¢‚â‚·‚­‚È‚éƒXƒNƒŠƒvƒgD
+; ‘I‘ğ”ÍˆÍ‚ğR‚É‘—M‚·‚é‹@”\‚¾‚¯‚Í‘¼‚ÌƒAƒvƒŠƒP[ƒVƒ‡ƒ“(memopad, word, excel, etc.)‚Å‚àŠî–{“I‚Ég—p‰Â”\D
+; http://tolstoy.newcastle.edu.au/R/e7/help/09/06/0013.html‚ğQl‚É‚µ‚Ä‚¢‚Ü‚·D
 
-;; F3 é¸æŠç¯„å›²ã‚’é€ä¿¡
+;; “®ìğŒ
+; Windows‚ÅR‚ÆAutoHotkey‚ªƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚Ä‚¢‚é
+; Rgui‚Ö‚ÌƒpƒX‚ª’Ê‚Á‚Ä‚¢‚é(ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚©‚ç rgui ‚ÆƒRƒ}ƒ“ƒh‚ğ’@‚¢‚ÄÀs‚Å‚«‚é)
+; Windows7, R 2.10.0, AutoHotkey 1.0.48.05‚Å“®ìŠm”F
+
+;; ƒzƒbƒgƒL[ƒŠƒXƒg
+; F3:    ‘I‘ğ”ÍˆÍ‚ğR Console‚É‘—‚Á‚ÄÀsD‘I‘ğ‚ª‚È‚¢ê‡‚ÍƒNƒŠƒbƒvƒ{[ƒh“à‚ğ‘—‚éD
+;        ƒL[‚ğ—£‚·‚Ü‚ÅƒEƒBƒ“ƒhƒE‚ÌƒtƒH[ƒJƒX‚ÍR‚Ì‚Ü‚ÜD
+; F4:    Œ»İ‚Ìs‚ğR Console‚É‘—‚Á‚ÄÀs‚µCŸ‚Ìs‚Éi‚Ş(gvim‚Ì‚İ)D
+; C-c v: ƒJ[ƒ\ƒ‹‰º‚ÌƒIƒuƒWƒFƒNƒg–¼‚Åƒwƒ‹ƒv‚ğˆø‚­(gvim‚Ì‚İ)D
+; C-M-q: R Console‚ÌI—¹
+; q:     R Help‚ğ•Â‚¶‚éD‚»‚ÌÛgvim‚ª—§‚¿ã‚ª‚Á‚Ä‚¢‚ê‚Îgvim‚ğƒAƒNƒeƒBƒu‚É‚·‚éD
+
+; F3 Send selected region to R. #WinActivateForce
+    F3::
+    {
+        WinGet, active_id, ID, A
+        IfWinActive, ahk_class Vim
+            Send y
+        else
+            Send ^c
+        IfWinNotExist, R Console
+        {
+            Run, rgui --sdi
+            WinWait, R Console
+        }
+        WinActivate, R Console
+        sendinput, {Raw}%clipboard%
+        sendinput, {enter}
+        KeyWait, F3
+        WinActivate, ahk_id %active_id%
+    }
+    return
+
+;; For vim
+#IfWinActive, ahk_class Vim
+; F4 Send the current line in the gvim, and moves to the next line. (for gvim)
+    F4::
+    {
+        WinGet, active_id, ID, A
+        Send 0y$j ; yank the current line and moves to the next line
+        IfWinNotExist, R Console
+        {
+            Run, rgui  --sdi
+            WinWait, R Console
+        }
+        WinActivate, R Console
+        sendinput, {Raw}%clipboard%
+        sendinput, {enter}
+        WinActivate, ahk_id %active_id%
+    }
+    return 
+
+; C-c v Get help. (for gvim)
+    ^c::
+    Input, OutputVar, C I M T1, {Esc},v
+    if ErrorLevel = Match 
+    {
+        WinGet, active_id, ID, A
+        Send yiw ; yank word
+        IfWinNotExist, R Console
+        {
+            Run, rgui --sdi
+            WinWait, R Console
+        }
+        WinActivate, R Console
+        sendinput, {Raw}help(%clipboard%)
+        sendinput, {enter}
+        IfWinNotExist, R help on
+            WinActivate, ahk_id %active_id%
+    }
+    return
+#IfWinActive
+
+; C-M-q(Ctrl+Alt+q) Quit R Console.
+#IfWinExist, R Console
+    !^q::
+    {
+        WinActivate, R Console
+        sendinput, quit(save="no"){enter}
+    }
+return
+#IfWinExist
+
+; q Quit R Help and return to gvim.
+#IfWinActive, R Help on
+    q::
+    IfWinExist, ahk_class Vim
+    {
+        Send, q
+        WinActivate, ahk_class Vim
+    }
+    else Send, q
+    WinActivate, ahk_id %active_id%
+return
+#IfWinActive
+
+;; ŠT—v
+; WindowsƒAƒvƒŠƒP[ƒVƒ‡ƒ“(e.g. ƒƒ‚’ )‚©‚ç•Ö—˜‚ÉR‚ğg‚¤‚½‚ß‚ÌƒXƒNƒŠƒvƒg
+; SendVimtoR.ahk‚ğgvimˆÈŠO‚ÌƒAƒvƒŠ‚ÉŠg’£‚µ‚½‚à‚Ì
+
+;; F3 ‘I‘ğ”ÍˆÍ‚ğ‘—M
 ; c.f. SendVimtoR.ahk
 
-#IfWinnotActive, ahk_class Vim    ; Vimã®ã¯SendVimtoR.ahk
+#IfWinnotActive, ahk_class Vim    ; Vim‚Ì‚ÍSendVimtoR.ahk
 ;; F4 Send the current line and moves to the next line.
 F4::
 {
@@ -22,3 +124,26 @@ F4::
     WinActivate, ahk_id %active_id%
 }
 return
+
+;; C-c v Get help.
+^c::
+Input, OutputVar, C I M T1, {esc},v
+if ErrorLevel = Match
+{
+    WinGet, active_id, ID, A
+        Send, {ctrldown}{left}{shiftdown}{right}{ctrlup}{shiftup}^c{left}
+    IfWinNotExist, R Console
+    {
+        Run, rgui --sdi
+            WinWait, R Console
+    }
+    WinActivate, R Console
+        sendinput, {Raw}help(%clipboard%)
+        sendinput, {enter}
+    IfWinNotExist
+        WinActivate, ahk_id %active_id%
+}
+return
+
+
+#IfWinnotActive
