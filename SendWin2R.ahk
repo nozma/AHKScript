@@ -53,7 +53,8 @@ F4::
     WinActivate, R Console
         sendinput, {Raw}%clipboard%
         sendinput, {enter}
-    WinActivate, ahk_id %active_id%
+    KeyWait, F4
+        WinActivate, ahk_id %active_id%
 }
 return 
 
