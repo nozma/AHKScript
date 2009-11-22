@@ -100,12 +100,8 @@ return
 return
 #IfWinActive
 
-;; 概要
+;; for Windows applications 
 ; Windowsアプリケーション(e.g. メモ帳)から便利にRを使うためのスクリプト
-; SendVimtoR.ahkをgvim以外のアプリに拡張したもの
-
-;; F3 選択範囲を送信
-; c.f. SendVimtoR.ahk
 
 #IfWinnotActive, ahk_class Vim    ; VimのはSendVimtoR.ahk
 ;; F4 Send the current line and moves to the next line.
