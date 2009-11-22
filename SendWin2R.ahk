@@ -26,7 +26,7 @@ return
 }
 return
 
-; Activate hotkeys while exists R Console.
+; Activate hotkeys while R Console is exist.
 #IfWinExist R Console
 ; F3 Send selected region to R. #WinActivateForce
 F3::
@@ -53,6 +53,7 @@ F4::
     WinActivate, R Console
         sendinput, {Raw}%clipboard%
         sendinput, {enter}
+    WinWait, R Console
     KeyWait, F4
         WinActivate, ahk_id %active_id%
 }
@@ -108,5 +109,32 @@ q::
 }
 return
 #IfWinActive
+
+; C-g Focus R Graphics window.
+#IfWinExist R Graphics
+^g::
+{
+    WinGet, active_id, ID, A
+    WinActivate, R Graphics
+   ;     KeyWait, g
+   Loop
+   {
+       Sleep, 10
+           GetKeyState, state, g, P
+           if state = U
+           {
+               WinActivate, ahk_id %active_id%
+               break
+           }
+           GetKeyState, stateq, q, P
+           if stateq = D
+           {
+               Send, !{F4}
+               WinActivate, ahk_id %active_id%
+               break
+           }
+   }
+}
+return
 
 #IfWinExist
