@@ -22,13 +22,12 @@ F3::
     WinGet, active_id, ID, A
         IfWinActive, ahk_class Vim
         Send y
-        else
-            Send ^c
-                IfWinNotExist, R Console
-                {
-                    Run, rgui --sdi
-                        WinWait, R Console
-                }
+        else Send ^c
+            IfWinNotExist, R Console
+            {
+                Run, rgui --sdi
+                    WinWait, R Console
+            }
         WinActivate, R Console
             sendinput, {Raw}%clipboard%
             sendinput, {enter}
@@ -37,13 +36,13 @@ F3::
 }
 return
 
-;; For vim
-#IfWinActive, ahk_class Vim
 ; F4 Send the current line in the gvim, and moves to the next line. (for gvim)
 F4::
 {
     WinGet, active_id, ID, A
-        Send 0y$j ; yank the current line and moves to the next line
+    IfWinActive, ahk_class Vim
+    Send 0y$j ; for gvim
+    else Send {home}{shiftdown}{end}{left}{shiftup}^c{down}{home} ; for other windows application
         IfWinNotExist, R Console
         {
             Run, rgui  --sdi
@@ -56,18 +55,40 @@ F4::
 }
 return 
 
-; C-c v Get help. (for gvim)
+; C-c v Get help. 
+#IfWinNotActive, ahk_class Vim
+~^c::
+Input, OutputVar, C I M T1, {Esc},v
+if ErrorLevel = Match 
+{
+    WinGet, active_id, ID, A
+    Send {ctrldown}{left}{shiftdown}{right}{ctrlup}{shiftup}^c{left}
+    IfWinNotExist, R Console
+    {
+        Run, rgui --sdi
+            WinWait, R Console
+    }
+    WinActivate, R Console
+        sendinput, {Raw}help(%clipboard%)
+        sendinput, {enter}
+    IfWinNotExist, R help on
+        WinActivate, ahk_id %active_id%
+}
+return
+#IfWinNotActive
+; for gvim
+#IfWinActive, ahk_class Vim
 ^c::
 Input, OutputVar, C I M T1, {Esc},v
 if ErrorLevel = Match 
 {
     WinGet, active_id, ID, A
-        Send yiw ; yank word
-        IfWinNotExist, R Console
-        {
-            Run, rgui --sdi
-                WinWait, R Console
-        }
+    Send yiw ; yank word
+    IfWinNotExist, R Console
+    {
+        Run, rgui --sdi
+            WinWait, R Console
+    }
     WinActivate, R Console
         sendinput, {Raw}help(%clipboard%)
         sendinput, {enter}
@@ -87,59 +108,12 @@ return
 return
 #IfWinExist
 
-; q Quit R Help and return to gvim.
+; q Quit R Help and return to window.
 #IfWinActive, R Help on
 q::
-IfWinExist, ahk_class Vim
 {
     Send, q
-        WinActivate, ahk_class Vim
-}
-else Send, q
-WinActivate, ahk_id %active_id%
-return
-#IfWinActive
-
-;; for Windows applications 
-; Windowsアプリケーション(e.g. メモ帳)から便利にRを使うためのスクリプト
-
-#IfWinnotActive, ahk_class Vim    ; VimのはSendVimtoR.ahk
-;; F4 Send the current line and moves to the next line.
-F4::
-{
-    WinGet, active_id, ID, A
-        Send, {home}{shiftdown}{end}{shiftup}^c{down}{home}
-    IfWinNotExist, R Console
-    {
-        Run, rgui --sdi
-            WinWait, R Console
-    }
-    WinActivate, R Console
-        sendinput, {Raw}%clipboard%
-        sendinput, {enter}
-    WinActivate, ahk_id %active_id%
-}
-return
-
-;; C-c v Get help.
-^c::
-Input, OutputVar, C I M T1, {esc},v
-if ErrorLevel = Match
-{
-    WinGet, active_id, ID, A
-        Send, {ctrldown}{left}{shiftdown}{right}{ctrlup}{shiftup}^c{left}
-    IfWinNotExist, R Console
-    {
-        Run, rgui --sdi
-            WinWait, R Console
-    }
-    WinActivate, R Console
-        sendinput, {Raw}help(%clipboard%)
-        sendinput, {enter}
-    IfWinNotExist
         WinActivate, ahk_id %active_id%
 }
 return
-
-
-#IfWinnotActive
+#IfWinActive
